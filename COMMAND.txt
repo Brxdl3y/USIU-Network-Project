@@ -1,0 +1,2089 @@
+================================================================================
+         USIU CAMPUS NETWORK — FULL CONFIGURATION REFERENCE
+                       commands.txt
+================================================================================
+  Author    : Bradley
+  Project   : USIU Campus Network Simulation
+  Tool      : Cisco Packet Tracer 8.x
+  GitHub    : github.com/Brxdl3y
+================================================================================
+ 
+  DEVICE INDEX
+  ─────────────────────────────────────────────────────────────────────────────
+  ROUTERS
+    [1]  USI-CORE-R1         Core Router          (Cisco 2911)
+    [2]  SEC-EDGE-R2         Security Zone Edge   (Cisco 2911)
+    [3]  USIU-EDGE-R3        S.O.B Zone Edge      (Cisco 2911)
+    [4]  RT4                 Admin Zone Edge      (Cisco 2911)
+    [5]  RT5                 SOH Zone Edge        (Cisco 2911)
+ 
+  DISTRIBUTION SWITCHES (L3)
+    [6]  SEC-DIST-SW2        Security Zone Dist   (Cisco 3560-24PS)
+    [7]  S.O.B-DIST-SW3      S.O.B Zone Dist      (Cisco 3560-24PS)
+    [8]  ADMIN-DIST-SW4      Admin Zone Dist      (Cisco 3560-24PS)
+    [9]  SOH-DIST-SW5        SOH Zone Dist        (Cisco 3560-24PS)
+ 
+  ACCESS SWITCHES (L2)
+    [10] AC-SW2              Security Zone Access (Cisco 2960-24TT)
+    [11] S.O.B-AC-SW3        S.O.B Zone Access    (Cisco 2960-24TT)
+    [12] ADMIN-AC-SW4        Admin Zone Access    (Cisco 2960-24TT)
+    [13] SOH-AC-SW5          SOH Zone Access      (Cisco 2960-24TT)
+  ─────────────────────────────────────────────────────────────────────────────
+ 
+================================================================================
+[1] USI-CORE-R1 — CORE ROUTER
+================================================================================
+ 
+enable
+configure terminal
+ 
+! ── Hostname & Security ────────────────
+hostname USI-CORE-R1
+enable secret DHCP
+no ip domain-lookup
+banner motd #
+  UNAUTHORIZED ACCESS IS STRICTLY PROHIBITED
+  USIU Campus Network — Authorized Personnel Only
+#
+ 
+! ── Loopback ───────────────────────────────────────────────
+interface Loopback0
+ ip address 1.1.1.11 255.255.255.255
+ no shutdown
+ 
+! ── Serial Interfaces (WAN Links to Edge Routers) ─────────
+interface Serial0/3/0
+ description LINK-TO-SEC-EDGE-R2
+ ip address 176.14.34.17 255.255.255.0
+ encapsulation ppp
+ clock rate 64000
+ no shutdown
+ 
+interface Serial0/3/1
+ description LINK-TO-USIU-EDGE-R3
+ ip address 99.120.7.6 255.255.255.0
+ encapsulation ppp
+ clock rate 64000
+ no shutdown
+ 
+! 
+interface Serial0/2/0
+ ip address 99.134.2.9 255.255.255.0
+ encapsulation ppp
+ clock rate 64000
+ no shutdown
+!
+interface Serial0/2/1
+ ip address 152.9.10.3 255.255.255.0
+ encapsulation ppp
+ no shutdown
+!
+interface Serial0/3/0
+ ip address 176.14.34.17 255.255.0.0
+ encapsulation ppp
+ no shutdown
+!
+interface Serial0/3/1
+ ip address 99.120.7.6 255.255.255.0
+ encapsulation ppp
+ clock rate 64000
+ no shutdown
+ 
+! ── OSPF (Area 0 Backbone) ────────────────
+router ospf 1
+ log-adjacency-changes
+ network 99.120.7.0 0.0.0.255 area 0
+ network 176.14.34.0 0.0.0.255 area 0
+ network 99.134.2.0 0.0.0.255 area 0
+ network 152.9.10.0 0.0.0.255 area 0
+ network 220.12.192.0 0.0.0.255 area 0
+ network 1.1.1.11 0.0.0.0 area 0
+ 
+! ── Static Default Route to ISP ─────────
+ip route 0.0.0.0 0.0.0.0 Serial0/3/0
+ 
+end
+write memory
+
+##########################################################################
+
+[2] SEC-EDGE-R2 — SECURITY ZONE EDGE ROUTER
+================================================================================
+ 
+enable
+configure terminal
+ 
+! ── Hostname & Security ──────────────────────
+hostname SEC-EDGE-R2
+enable secret DHCP
+no ip domain-lookup
+ 
+! ── Loopback ───────────────────
+interface Loopback0
+ ip address 2.2.2.2 255.255.255.255
+ no shutdown
+ 
+! ── GigabitEthernet (Downlink to SEC-DIST-SW2) ───────────────
+interface GigabitEthernet0/0
+ description LINK-TO-SEC-DIST-SW2
+ ip address 134.19.2.11 255.255.255.0
+ no shutdown
+ 
+! ── Serial (Uplink to CORE-R1) ───────────────────────────
+interface Serial0/3/0
+ description LINK-TO-CORE-R1
+ ip address 176.14.34.55 255.255.255.0
+ encapsulation ppp
+ no shutdown
+ 
+! ── DHCP Excluded Addresses ────────────────────────────
+ip dhcp excluded-address 10.14.10.1 10.14.10.10
+ip dhcp excluded-address 172.16.2.1 172.16.2.10
+ 
+! ── DHCP Pools ──────────────────────────────────────
+ip dhcp pool VLAN10_HOSTEL
+ network 10.14.10.0 255.255.255.0
+ default-router 10.14.10.1
+ dns-server 8.8.8.8
+ domain-name HOSTEL
+ 
+ip dhcp pool VLAN20_CCTV
+ network 172.16.2.0 255.255.255.0
+ default-router 172.16.2.1
+ dns-server 8.8.8.8
+ domain-name CCTV-SECURITY
+ 
+! ── OSPF ───────────────────────────
+router ospf 2
+ router-id 2.2.2.2
+ log-adjacency-changes
+ redistribute connected subnets
+ network 134.19.2.0 0.0.0.255 area 0
+ network 176.14.34.0 0.0.0.255 area 0
+ network 2.2.2.2 0.0.0.0 area 0
+ 
+end
+write memory
+ 
+ 
+#####################################################################
+
+
+[3] USIU-EDGE-R3 — S.O.B ZONE EDGE ROUTER
+================================================================================
+ 
+enable
+configure terminal
+ 
+! ── Hostname & Security ──────────────────────────
+hostname USIU-EDGE-R3
+enable secret DHCP
+no ip domain-lookup
+ 
+! ── Loopback ──────────────────────────────────────────────
+Interface Loopback0
+ ip address 3.3.3.3 255.255.255.255
+ no shutdown
+ 
+! ── GigabitEthernet (Downlinks to Dist Switches) ───────────────────────
+interface GigabitEthernet0/0
+ description LINK-TO-SOB-DIST-SW1
+ ip address 12.10.23.2 255.255.255.0
+ duplex auto
+ speed 100
+ no shutdown
+ 
+interface GigabitEthernet0/1
+ description LINK-TO-SOB-DIST-SW3
+ ip address 165.2.10.23 255.255.255.0
+ duplex auto
+ speed 100
+ no shutdown
+ 
+! ── Serial (Uplink to CORE-R1) ───────────────────────────────
+interface Serial0/3/0
+ description LINK-TO-CORE-R1
+ ip address 99.120.7.8 255.255.255.0
+ encapsulation ppp
+ no shutdown
+ 
+! ── DHCP Excluded Addresses ──────────────────────────────────
+ip dhcp excluded-address 123.10.10.1 123.10.10.10
+ip dhcp excluded-address 36.38.12.1 36.38.12.10
+ip dhcp excluded-address 196.34.12.1 196.34.12.10
+ip dhcp excluded-address 192.168.2.1 192.168.2.10
+ 
+! ── DHCP Pools ───────────────────────────────────
+ip dhcp pool VLAN30_ICT
+ network 123.10.10.0 255.255.255.0
+ default-router 123.10.10.1
+ dns-server 8.8.8.8
+ domain-name ICT-DEPT
+ 
+ip dhcp pool VLAN40_LIBRARY
+ network 36.38.12.0 255.255.255.0
+ default-router 36.38.12.1
+ dns-server 8.8.8.8
+ domain-name LIBRARY
+ 
+ip dhcp pool VLAN50_FINANCE
+ network 196.34.12.0 255.255.255.0
+ default-router 196.34.12.1
+ dns-server 8.8.8.8
+ domain-name FINANCE
+ 
+ip dhcp pool VLAN60_CAFETERIA
+ network 192.168.2.0 255.255.255.0
+ default-router 192.168.2.1
+ dns-server 8.8.8.8
+ domain-name CAFETERIA
+ 
+! ── OSPF ────────────────────────────────
+router ospf 3
+ router-id 3.3.3.3
+ log-adjacency-changes
+ network 12.10.23.0 0.0.0.255 area 0
+ network 99.120.7.0 0.0.0.255 area 0
+ network 165.2.10.0 0.0.0.255 area 0
+ network 3.3.3.3 0.0.0.0 area 0
+ 
+end
+write memory
+ 
+#####################################################################
+
+[4] RT4 — ADMIN ZONE EDGE ROUTER
+================================================================================
+ 
+enable
+configure terminal
+ 
+! ── Hostname & Security ─────────────────
+hostname USIU-EDGE-R4
+enable secret DHCP
+no ip domain-lookup
+ 
+! ── Loopback ───────────
+interface Loopback0
+ ip address 4.4.4.4 255.255.255.255
+ no shutdown
+ 
+! ── GigabitEthernet (Downlink to ADMIN-DIST-SW4) ─────────
+
+ Interface GigabitEthernet0/0
+ ip address 12.34.9.22 255.255.255.0
+ duplex auto
+ speed 100
+ no shutdown
+!
+interface GigabitEthernet0/1
+ ip address 10.10.39.12 255.255.255.0
+ no shutdown
+ 
+! ── Serial (Uplink to CORE-R1) ──────
+interface Serial0/3/0
+ description LINK-TO-CORE-R1
+ ip address 152.9.10.34 255.255.255.0
+ encapsulation ppp
+ no shutdown
+ 
+! ── DHCP Excluded Addresses ────────
+ip dhcp excluded-address 144.1.34.1 144.1.34.10
+ip dhcp excluded-address 90.45.101.1 90.45.101.10
+ip dhcp excluded-address 122.9.23.1 122.9.23.10
+ip dhcp excluded-address 172.10.10.1 172.10.10.10
+ 
+! ── DHCP Pool─────
+ip dhcp pool VLAN70_CONFERENCE
+ network 144.1.34.0 255.255.255.0
+ default-router 144.1.34.1
+ dns-server 8.8.8.8
+ domain-name CONFERENCE
+ 
+ip dhcp pool VLAN80_ADMIN
+ network 90.45.101.0 255.255.255.0
+ default-router 90.45.101.1
+ dns-server 8.8.8.8
+ domain-name ADMINISTRATION
+
+ ip dhcp pool vlan90
+ network 122.9.23.0 255.255.255.0
+ default-router 122.9.23.1
+ dns-server 8.8.8.8
+ domain-name LECTURE-HALLS
+
+ip dhcp pool VLAN100
+ network 172.10.10.0 255.255.255.0
+ default-router 172.10.10.1
+ dns-server 8.8.8.8
+ domain-name MEDLAB
+ 
+! ── OSPF ─────────────────────────────────────────────────────────────────────
+router ospf 4
+ router-id 4.4.4.4
+ log-adjacency-changes
+ redistribute connected subnets
+  network 10.10.39.0 0.0.0.255 area 0
+ network 12.23.4.0 0.0.0.255 area 0
+ network 4.4.4.4 0.0.0.0 area 0
+ 
+end
+write memory
+
+
+#####################################################################
+
+
+[5] RT5 — SOH ZONE EDGE ROUTER
+================================================================================
+ 
+enable
+configure terminal
+ 
+! ── Hostname & Security ─────────
+hostname USIU-EDGE-R5
+enable secret DHCP
+no ip domain-lookup
+ 
+! ── Loopback ─────────────────────────────────────────────────────────────────
+interface Loopback0
+ ip address 5.5.5.5 255.255.255.255
+ no shutdown
+ 
+! ── GigabitEthernet (Downlink to SOH-DIST-SW5) ───────────────────────────────
+interface GigabitEthernet0/0
+ description LINK-TO-SOH-DIST-SW5
+ ip address 195.18.2.4 255.255.255.0
+ no shutdown
+ 
+! ── Serial (Uplink to CORE-R1)──────────
+interface Serial0/3/0
+ description LINK-TO-CORE-R1
+ ip address 99.134.2.3 255.255.255.0
+ encapsulation ppp
+ no shutdown
+ 
+! ── DHCP Excluded Addresses──────────
+
+ip dhcp excluded-address 145.20.13.1 145.20.13.10
+ip dhcp excluded-address 196.98.21.1 196.98.21.10
+ 
+! ── DHCP Pools ─────────────────
+ 
+ip dhcp pool VLAN110_COURTROOM
+ network 145.20.13.0 255.255.255.0
+ default-router 145.20.13.1
+ dns-server 8.8.8.8
+ domain-name COURT-ROOM
+ 
+ip dhcp pool VLAN120_ENGINEERING
+ network 196.98.21.0 255.255.255.0
+ default-router 196.98.21.1
+ dns-server 8.8.8.8
+ domain-name ENGINEERING
+ 
+! ── OSPF ─────────────
+router ospf 5
+ router-id 5.5.5.5
+ log-adjacency-changes
+ redistribute connected subnets
+ network 195.18.2.0 0.0.0.255 area 0
+ network 99.134.2.0 0.0.0.255 area 0
+ network 5.5.5.5 0.0.0.0 area 0
+ 
+end
+write memory
+
+
+#####################################################################
+
+
+[6] SEC-DIST-SW2 — SECURITY ZONE DISTRIBUTION SWITCH (L3)
+================================================================================
+ 
+enable
+configure terminal
+ 
+! ── Hostname & Security ───────
+hostname SEC-DIST-SW2
+enable secret DHCP
+no ip domain-lookup
+ip routing
+ 
+! ── VLAN Database ─────────
+vlan 10
+ name HOSTELS
+vlan 20
+ name CCTV-SECURITY
+vlan 30
+ name ICT-DEPT
+vlan 40
+ name LIBRARY
+vlan 50
+ name FINANCE
+vlan 60
+ name CAFETERIA
+vlan 70
+ name CONFERENCE
+vlan 80
+ name ADMIN
+vlan 90
+ name LECTURE-HALLS
+vlan 100
+ name MEDLABS
+vlan 110
+ name COURT-ROOM
+vlan 120
+ name ENG
+exit
+ 
+! ── Spanning Tree ────────
+spanning-tree mode rapid-pvst
+spanning-tree vlan 10,20 priority 24576
+spanning-tree vlan 30,40 priority 28672
+ 
+! ── EtherChannel (Downlinks to AC-SW2) ──────────
+interface FastEthernet0/1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/2
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+! ── Standalone Trunk to AC-SW ─────────────
+interface FastEthernet0/5
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+! ── Port-Channel Interfaces ─────────────────
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface Port-channel3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+! ── Routed Uplink to SEC-EDGE-R2 ─────────
+interface FastEthernet0/6
+ no switchport
+ ip address 134.19.2.2 255.255.255.0
+ ip ospf 1 area 0
+ duplex auto
+ speed 100
+ no shutdown
+ 
+! ── SVIs (Inter-VLAN Routing + HSRP + DHCP Relay) ───────────
+interface Vlan1
+ no ip address
+ shutdown
+ 
+interface Vlan10
+ mac-address 0060.47a0.8c01
+ ip address 10.14.10.5 255.255.255.0
+ ip helper-address 134.19.2.11
+ standby 10 ip 10.14.10.1
+ standby 10 priority 200
+ standby 10 preempt
+ no shutdown
+ 
+interface Vlan20
+ mac-address 0060.47a0.8c02
+ ip address 172.16.2.5 255.255.255.0
+ ip helper-address 134.19.2.11
+ standby 20 ip 172.16.2.1
+ standby 20 priority 200
+ standby 20 preempt
+ no shutdown
+ 
+! ── OSPF ────
+router ospf 1
+ log-adjacency-changes
+ redistribute connected subnets
+ network 134.19.2.0 0.0.0.255 area 0
+ network 10.14.10.0 0.0.0.255 area 0
+ network 172.16.2.0 0.0.0.255 area 0
+ passive-interface Vlan10
+ passive-interface Vlan20
+ 
+! ── DHCP Snooping ───────
+ip dhcp snooping
+ip dhcp snooping vlan 10,20
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/1
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/2
+ ip dhcp snooping trust
+ 
+ 
+! ── DAI ────────────────
+ip arp inspection vlan 10,20
+ 
+interface FastEthernet0/1
+ ip arp inspection trust
+ 
+interface FastEthernet0/2
+ ip arp inspection trust
+ 
+end
+write memory
+
+#####################################################################
+
+
+[7] S.O.B-DIST-SW3 — S.O.B ZONE DISTRIBUTION SWITCH (L3)
+================================================================================
+ 
+enable
+configure terminal
+ 
+! ── Hostname & Security ──────────────────────────────────────────────────────
+hostname S.O.B-DIST-SW3
+enable secret DHCP
+no ip domain-lookup
+ip routing
+ 
+! ── VLAN Database ─────────────────────────────────────────────────────────────
+vlan 10
+ name HOSTELS
+vlan 20
+ name CCTV-SECURITY
+vlan 30
+ name ICT-DEPT
+vlan 40
+ name LIBRARY
+vlan 50
+ name FINANCE
+vlan 60
+ name CAFETERIA
+vlan 70
+ name CONFERENCE
+vlan 80
+ name ADMIN
+vlan 90
+ name LECTURE-HALLS
+vlan 100
+ name MEDLABS
+vlan 110
+ name COURT-ROOM
+vlan 120
+ name ENG
+exit
+ 
+! ── Spanning Tree ─────────────────────────────────────────────────────────────
+spanning-tree mode rapid-pvst
+spanning-tree vlan 50,60 priority 24576
+spanning-tree vlan 70,80 priority 28672
+ 
+! ── Loopback ─────────────────────────────────────────────────────────────────
+interface Loopback0
+ ip address 11.12.1.11 255.255.255.255
+ no shutdown
+ 
+! ── EtherChannel (Downlinks to S.O.B-AC-SW3) ────────────────────────────────
+interface FastEthernet0/2
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+interface FastEthernet0/3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/5
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+! ── Port-Channel Interfaces ───────────────────────────────────────────────────
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface Port-channel3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+! ── Routed Uplink to USIU-EDGE-R3 ────────────────────────────────────────────
+interface FastEthernet0/1
+ no switchport
+ ip address 165.2.10.16 255.255.255.0
+ ip ospf 3 area 0
+ duplex auto
+ speed 100
+ no shutdown
+ 
+! ── SVIs (Inter-VLAN Routing + HSRP + DHCP Relay) ────────────────────────────
+interface Vlan1
+ no ip address
+ shutdown
+ 
+interface Vlan50
+ mac-address 0060.473e.7301
+ ip address 196.34.12.5 255.255.255.0
+ ip helper-address 165.2.10.23
+ standby 50 ip 196.34.12.1
+ standby 50 priority 200
+ standby 50 preempt
+ no shutdown
+ 
+interface Vlan60
+ mac-address 0060.473e.7302
+ ip address 192.168.2.5 255.255.255.0
+ ip helper-address 165.2.10.23
+ standby 60 ip 192.168.2.1
+ standby 60 priority 200
+ standby 60 preempt
+ no shutdown
+ 
+interface Vlan70
+ mac-address 0060.473e.7303
+ no ip address
+ standby 70 ip 144.1.34.1
+ standby 70 priority 90
+ no shutdown
+ 
+interface Vlan80
+ mac-address 0060.473e.7304
+ no ip address
+ standby 80 ip 90.45.101.1
+ standby 80 priority 90
+ no shutdown
+ 
+! ── OSPF ─────────────────────────────────────────────────────────────────────
+router ospf 3
+ log-adjacency-changes
+ redistribute connected subnets
+ network 165.2.10.0 0.0.0.255 area 0
+ network 196.34.12.0 0.0.0.255 area 0
+ network 192.168.2.0 0.0.0.255 area 0
+ passive-interface Vlan50
+ passive-interface Vlan60
+ 
+! ── DHCP Snooping ─────────────────────────────────────────────────────────────
+ip dhcp snooping
+ip dhcp snooping vlan 50,60
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/3
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/4
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/5
+ ip dhcp snooping trust
+ 
+! ── DAI ──────────────────────────────────────────────────────────────────────
+ip arp inspection vlan 50,60
+ 
+interface FastEthernet0/3
+ ip arp inspection trust
+ 
+interface FastEthernet0/4
+ ip arp inspection trust
+ 
+interface FastEthernet0/5
+ ip arp inspection trust
+ 
+end
+write memory
+ 
+
+#####################################################################
+ 
+
+[8] ADMIN-DIST-SW4 — ADMIN ZONE DISTRIBUTION SWITCH (L3)
+================================================================================
+ 
+enable
+configure terminal
+ 
+hostname ADMIN-DIST-SW4
+enable secret DHCP
+no ip domain-lookup
+ip routing
+ 
+vlan 70
+ name CONFERENCE
+vlan 80
+ name ADMIN
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree vlan 70,80 priority 24576
+ 
+interface Loopback0
+ ip address 11.12.1.44 255.255.255.255
+ no shutdown
+ 
+interface FastEthernet0/1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/2
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface Port-channel3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface FastEthernet0/6
+ no switchport
+ ip address 12.23.4.2 255.255.255.0
+ ip ospf 4 area 0
+ no shutdown
+ 
+interface Vlan1
+ no ip address
+ shutdown
+ 
+interface Vlan70
+ mac-address 0060.47b1.1101
+ ip address 144.1.34.17 255.255.255.0
+ ip helper-address 12.23.4.1
+ standby 70 ip 144.1.34.1
+ standby 70 priority 200
+ standby 70 preempt
+ no shutdown
+ 
+interface Vlan80
+ mac-address 0060.47b1.1102
+ ip address 90.45.101.17 255.255.255.0
+ ip helper-address 12.23.4.1
+ standby 80 ip 90.45.101.1
+ standby 80 priority 200
+ standby 80 preempt
+ no shutdown
+ 
+router ospf 4
+ log-adjacency-changes
+ redistribute connected subnets
+ network 12.23.4.0 0.0.0.255 area 0
+ network 144.1.34.0 0.0.0.255 area 0
+ network 90.45.101.0 0.0.0.255 area 0
+ passive-interface Vlan70
+ passive-interface Vlan80
+ 
+ip dhcp snooping
+ip dhcp snooping vlan 70,80
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/1
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/2
+ ip dhcp snooping trust
+ 
+ip arp inspection vlan 70,80
+ 
+interface FastEthernet0/1
+ ip arp inspection trust
+ 
+interface FastEthernet0/2
+ ip arp inspection trust
+ 
+end
+write memory
+ 
+
+#####################################################################
+
+
+ [8] ADMIN-DIST-SW4 — ADMIN ZONE DISTRIBUTION SWITCH (L3)==
+ 
+enable
+configure terminal
+ 
+hostname ADMIN-DIST-SW4
+enable secret DHCP
+no ip domain-lookup
+ip routing
+ 
+vlan 70
+ name CONFERENCE
+vlan 80
+ name ADMIN
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree vlan 70,80 priority 24576
+ 
+interface Loopback0
+ ip address 11.12.1.44 255.255.255.255
+ no shutdown
+ 
+interface FastEthernet0/1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/2
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface Port-channel3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface FastEthernet0/6
+ no switchport
+ ip address 12.23.4.2 255.255.255.0
+ ip ospf 4 area 0
+ no shutdown
+ 
+interface Vlan1
+ no ip address
+ shutdown
+ 
+interface Vlan70
+ mac-address 0060.47b1.1101
+ ip address 144.1.34.17 255.255.255.0
+ ip helper-address 12.23.4.1
+ standby 70 ip 144.1.34.1
+ standby 70 priority 200
+ standby 70 preempt
+ no shutdown
+ 
+interface Vlan80
+ mac-address 0060.47b1.1102
+ ip address 90.45.101.17 255.255.255.0
+ ip helper-address 12.23.4.1
+ standby 80 ip 90.45.101.1
+ standby 80 priority 200
+ standby 80 preempt
+ no shutdown
+ 
+router ospf 4
+ log-adjacency-changes
+ redistribute connected subnets
+ network 12.23.4.0 0.0.0.255 area 0
+ network 144.1.34.0 0.0.0.255 area 0
+ network 90.45.101.0 0.0.0.255 area 0
+ passive-interface Vlan70
+ passive-interface Vlan80
+ 
+ip dhcp snooping
+ip dhcp snooping vlan 70,80
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/1
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/2
+ ip dhcp snooping trust
+ 
+ip arp inspection vlan 70,80
+ 
+interface FastEthernet0/1
+ ip arp inspection trust
+ 
+interface FastEthernet0/2
+ ip arp inspection trust
+ 
+end
+write memory 
+
+#####################################################################
+
+
+[9] SOH-DIST-SW5 — SOH ZONE DISTRIBUTION SWITCH (L3)
+ 
+enable
+configure terminal
+ 
+hostname SOH-DIST-SW5
+enable secret DHCP
+no ip domain-lookup
+ip routing
+ 
+vlan 90
+ name LECTURE-HALLS
+vlan 100
+ name MEDLABS
+vlan 110
+ name COURT-ROOM
+vlan 120
+ name ENG
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree vlan 90,100 priority 24576
+spanning-tree vlan 110,120 priority 28672
+ 
+interface Loopback0
+ ip address 11.12.1.55 255.255.255.255
+ no shutdown
+ 
+interface FastEthernet0/1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/2
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface Port-channel3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface FastEthernet0/6
+ no switchport
+ ip address 10.10.39.17 255.255.255.0
+ ip ospf 5 area 0
+ no shutdown
+ 
+interface Vlan1
+ no ip address
+ shutdown
+ 
+interface Vlan90
+ mac-address 0060.47c2.2201
+ ip address 172.10.10.17 255.255.255.0
+ ip helper-address 10.10.39.1
+ standby 90 ip 172.10.10.1
+ standby 90 priority 200
+ standby 90 preempt
+ no shutdown
+ 
+interface Vlan100
+ mac-address 0060.47c2.2202
+ ip address 122.9.23.17 255.255.255.0
+ ip helper-address 10.10.39.1
+ standby 100 ip 122.9.23.1
+ standby 100 priority 200
+ standby 100 preempt
+ no shutdown
+ 
+interface Vlan110
+ mac-address 0060.47c2.2203
+ ip address 145.20.13.17 255.255.255.0
+ ip helper-address 10.10.39.1
+ standby 110 ip 145.20.13.1
+ standby 110 priority 200
+ standby 110 preempt
+ no shutdown
+ 
+interface Vlan120
+ mac-address 0060.47c2.2204
+ ip address 196.98.21.17 255.255.255.0
+ ip helper-address 10.10.39.1
+ standby 120 ip 196.98.21.1
+ standby 120 priority 200
+ standby 120 preempt
+ no shutdown
+ 
+router ospf 5
+ log-adjacency-changes
+ redistribute connected subnets
+ network 10.10.39.0 0.0.0.255 area 0
+ network 172.10.10.0 0.0.0.255 area 0
+ network 122.9.23.0 0.0.0.255 area 0
+ network 145.20.13.0 0.0.0.255 area 0
+ network 196.98.21.0 0.0.0.255 area 0
+ passive-interface Vlan90
+ passive-interface Vlan100
+ passive-interface Vlan110
+ passive-interface Vlan120
+ 
+ip dhcp snooping
+ip dhcp snooping vlan 90,100,110,120
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/1
+ ip dhcp snooping trust
+interface FastEthernet0/2
+ ip dhcp snooping trust
+ 
+ip arp inspection vlan 90,100,110,120
+ 
+interface FastEthernet0/1
+ ip arp inspection trust
+interface FastEthernet0/2
+ ip arp inspection trust
+ 
+end
+write memory
+ 
+#####################################################################
+
+[10] AC-SW2 — SECURITY ZONE ACCESS SWITCH (L2)
+
+enable
+configure terminal
+ 
+hostname AC-SW2
+enable secret cisco123
+no ip domain-lookup
+ 
+vlan 10
+ name HOSTELS
+vlan 20
+ name CCTV-SECURITY
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+ 
+! ── Access Ports ────
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 10
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/2
+ switchport mode access
+ switchport access vlan 20
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+! ── EtherChannel Uplinks to SEC-DIST-SW2 ───
+interface FastEthernet0/3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ 
+! ── DHCP Snooping ───────
+ip dhcp snooping
+ip dhcp snooping vlan 10,20
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/3
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/4
+ ip dhcp snooping trust
+ 
+! ── DAI ────
+ip arp inspection vlan 10,20
+ 
+interface FastEthernet0/3
+ ip arp inspection trust
+ 
+interface FastEthernet0/4
+ ip arp inspection trust
+ 
+end
+write memory
+
+
+#####################################################################
+
+
+[11] S.O.B-AC-SW3 — S.O.B ZONE ACCESS SWITCH (L2)
+ 
+enable
+configure terminal
+ 
+hostname S.O.B-AC-SW3
+enable secret cisco123
+no ip domain-lookup
+ 
+vlan 50
+ name FINANCE
+vlan 60
+ name CAFETERIA
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+ 
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 50
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/2
+ switchport mode access
+ switchport access vlan 60
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/5
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ 
+ip dhcp snooping
+ip dhcp snooping vlan 50,60
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/3
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/4
+ ip dhcp snooping trust
+ 
+ip arp inspection vlan 50,60
+ 
+interface FastEthernet0/3
+ ip arp inspection trust
+ 
+interface FastEthernet0/4
+ ip arp inspection trust
+ 
+end
+write memory
+
+
+#####################################################################
+
+[12] ADMIN-AC-SW4 — ADMIN ZONE ACCESS SWITCH (L2)
+
+enable
+configure terminal
+ 
+hostname ADMIN-AC-SW4
+enable secret cisco123
+no ip domain-lookup
+ 
+vlan 70
+ name CONFERENCE
+vlan 80
+ name ADMIN
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+ 
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 70
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/2
+ switchport mode access
+ switchport access vlan 80
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/3
+ switchport mode access
+ switchport access vlan 80
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ 
+ip dhcp snooping
+ip dhcp snooping vlan 70,80
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/1
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/4
+ ip dhcp snooping trust
+ 
+ip arp inspection vlan 70,80
+ 
+interface FastEthernet0/1
+ ip arp inspection trust
+ 
+interface FastEthernet0/4
+ ip arp inspection trust
+ 
+end
+write memory
+
+
+#####################################################################
+
+[13] SOH-AC-SW5 — SOH ZONE ACCESS SWITCH (L2)
+ 
+enable
+configure terminal
+ 
+hostname SOH-AC-SW5
+enable secret cisco123
+no ip domain-lookup
+ 
+vlan 90
+ name LECTURE-HALLS
+vlan 100
+ name MEDLABS
+vlan 110
+ name COURT-ROOM
+vlan 120
+ name ENG
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+ 
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 90
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/2
+ switchport mode access
+ switchport access vlan 100
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/3
+ switchport mode access
+ switchport access vlan 110
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/4
+ switchport mode access
+ switchport access vlan 120
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/5
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/6
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ 
+ip dhcp snooping
+ip dhcp snooping vlan 90,100,110,120
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/5
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/6
+ ip dhcp snooping trust
+ 
+ip arp inspection vlan 90,100,110,120
+ 
+interface FastEthernet0/5
+ ip arp inspection trust
+ 
+interface FastEthernet0/6
+ ip arp inspection trust
+ 
+end
+write memory
+
+
+#####################################################################
+
+  VERIFICATION COMMANDS — QUICK REFERENCE
+ 
+! ── Routing ────────────────
+show ip route
+show ip ospf neighbor
+show ip ospf database
+show ip ospf interface brief
+ 
+! ── Switching ─────
+show vlan brief
+show interfaces trunk
+show etherchannel summary
+show spanning-tree
+show spanning-tree summary
+ 
+! ── Redundancy ─────
+show standby brief
+show standby
+ 
+! ── DHCP ───
+show ip dhcp binding
+show ip dhcp pool
+show ip dhcp conflict
+ 
+! ── Security ─────
+show ip dhcp snooping
+show ip dhcp snooping binding
+show ip arp inspection
+show ip arp inspection statistics
+show port-security
+show port-security interface <interface>
+show port-security address
+ 
+! ── Interfaces ─────
+show ip interface brief
+show interfaces <interface>
+show run | section ospf
+show run | section vlan
+show run | section interface
+
+
+#####################################################################
+
+
+  END OF COMMANDS.TXT
+  github.com/Brxdl3y | USIU Campus Network Simulation
+============================================================================
+================================================================================
+[9] SOH-DIST-SW5 — SOH ZONE DISTRIBUTION SWITCH (L3)
+================================================================================
+ 
+enable
+configure terminal
+ 
+hostname SOH-DIST-SW5
+enable secret cisco123
+no ip domain-lookup
+ip routing
+ 
+vlan 90
+ name LECTURE-HALLS
+vlan 100
+ name MEDLABS
+vlan 110
+ name COURT-ROOM
+vlan 120
+ name ENG
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree vlan 90,100 priority 24576
+spanning-tree vlan 110,120 priority 28672
+ 
+interface Loopback0
+ ip address 11.12.1.55 255.255.255.255
+ no shutdown
+ 
+interface FastEthernet0/1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/2
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 3 mode desirable
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface Port-channel3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface FastEthernet0/6
+ no switchport
+ ip address 10.10.39.17 255.255.255.0
+ ip ospf 5 area 0
+ no shutdown
+ 
+interface Vlan1
+ no ip address
+ shutdown
+ 
+interface Vlan90
+ mac-address 0060.47c2.2201
+ ip address 172.10.10.17 255.255.255.0
+ ip helper-address 10.10.39.1
+ standby 90 ip 172.10.10.1
+ standby 90 priority 200
+ standby 90 preempt
+ no shutdown
+ 
+interface Vlan100
+ mac-address 0060.47c2.2202
+ ip address 122.9.23.17 255.255.255.0
+ ip helper-address 10.10.39.1
+ standby 100 ip 122.9.23.1
+ standby 100 priority 200
+ standby 100 preempt
+ no shutdown
+ 
+interface Vlan110
+ mac-address 0060.47c2.2203
+ ip address 145.20.13.17 255.255.255.0
+ ip helper-address 10.10.39.1
+ standby 110 ip 145.20.13.1
+ standby 110 priority 200
+ standby 110 preempt
+ no shutdown
+ 
+interface Vlan120
+ mac-address 0060.47c2.2204
+ ip address 196.98.21.17 255.255.255.0
+ ip helper-address 10.10.39.1
+ standby 120 ip 196.98.21.1
+ standby 120 priority 200
+ standby 120 preempt
+ no shutdown
+ 
+router ospf 5
+ log-adjacency-changes
+ redistribute connected subnets
+ network 10.10.39.0 0.0.0.255 area 0
+ network 172.10.10.0 0.0.0.255 area 0
+ network 122.9.23.0 0.0.0.255 area 0
+ network 145.20.13.0 0.0.0.255 area 0
+ network 196.98.21.0 0.0.0.255 area 0
+ passive-interface Vlan90
+ passive-interface Vlan100
+ passive-interface Vlan110
+ passive-interface Vlan120
+ 
+ip dhcp snooping
+ip dhcp snooping vlan 90,100,110,120
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/1
+ ip dhcp snooping trust
+interface FastEthernet0/2
+ ip dhcp snooping trust
+ 
+ip arp inspection vlan 90,100,110,120
+ 
+interface FastEthernet0/1
+ ip arp inspection trust
+interface FastEthernet0/2
+ ip arp inspection trust
+ 
+end
+write memory
+ 
+ 
+================================================================================
+[10] AC-SW2 — SECURITY ZONE ACCESS SWITCH (L2)
+================================================================================
+ 
+enable
+configure terminal
+ 
+hostname AC-SW2
+enable secret cisco123
+no ip domain-lookup
+ 
+vlan 10
+ name HOSTELS
+vlan 20
+ name CCTV-SECURITY
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+ 
+! ── Access Ports ──────────────────────────────────────────────────────────────
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 10
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/2
+ switchport mode access
+ switchport access vlan 20
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+! ── EtherChannel Uplinks to SEC-DIST-SW2 ─────────────────────────────────────
+interface FastEthernet0/3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ 
+! ── DHCP Snooping ─────────────────────────────────────────────────────────────
+ip dhcp snooping
+ip dhcp snooping vlan 10,20
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/3
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/4
+ ip dhcp snooping trust
+ 
+! ── DAI ──────────────────────────────────────────────────────────────────────
+ip arp inspection vlan 10,20
+ 
+interface FastEthernet0/3
+ ip arp inspection trust
+ 
+interface FastEthernet0/4
+ ip arp inspection trust
+ 
+end
+write memory
+ 
+ 
+================================================================================
+[11] S.O.B-AC-SW3 — S.O.B ZONE ACCESS SWITCH (L2)
+================================================================================
+ 
+enable
+configure terminal
+ 
+hostname S.O.B-AC-SW3
+enable secret cisco123
+no ip domain-lookup
+ 
+vlan 50
+ name FINANCE
+vlan 60
+ name CAFETERIA
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+ 
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 50
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/2
+ switchport mode access
+ switchport access vlan 60
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/3
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/5
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ 
+ip dhcp snooping
+ip dhcp snooping vlan 50,60
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/3
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/4
+ ip dhcp snooping trust
+ 
+ip arp inspection vlan 50,60
+ 
+interface FastEthernet0/3
+ ip arp inspection trust
+ 
+interface FastEthernet0/4
+ ip arp inspection trust
+ 
+end
+write memory
+ 
+ 
+================================================================================
+[12] ADMIN-AC-SW4 — ADMIN ZONE ACCESS SWITCH (L2)
+================================================================================
+ 
+enable
+configure terminal
+ 
+hostname ADMIN-AC-SW4
+enable secret cisco123
+no ip domain-lookup
+ 
+vlan 70
+ name CONFERENCE
+vlan 80
+ name ADMIN
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+ 
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 70
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/2
+ switchport mode access
+ switchport access vlan 80
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/3
+ switchport mode access
+ switchport access vlan 80
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/4
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ 
+ip dhcp snooping
+ip dhcp snooping vlan 70,80
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/1
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/4
+ ip dhcp snooping trust
+ 
+ip arp inspection vlan 70,80
+ 
+interface FastEthernet0/1
+ ip arp inspection trust
+ 
+interface FastEthernet0/4
+ ip arp inspection trust
+ 
+end
+write memory
+ 
+ 
+================================================================================
+[13] SOH-AC-SW5 — SOH ZONE ACCESS SWITCH (L2)
+================================================================================
+ 
+enable
+configure terminal
+ 
+hostname SOH-AC-SW5
+enable secret cisco123
+no ip domain-lookup
+ 
+vlan 90
+ name LECTURE-HALLS
+vlan 100
+ name MEDLABS
+vlan 110
+ name COURT-ROOM
+vlan 120
+ name ENG
+exit
+ 
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+ 
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 90
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/2
+ switchport mode access
+ switchport access vlan 100
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/3
+ switchport mode access
+ switchport access vlan 110
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/4
+ switchport mode access
+ switchport access vlan 120
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+ 
+interface FastEthernet0/5
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface FastEthernet0/6
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+interface Port-channel1
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10,20,30,40,50,60,70,80,90,100,110,120
+ switchport mode trunk
+ 
+ip dhcp snooping
+ip dhcp snooping vlan 90,100,110,120
+no ip dhcp snooping information option
+ 
+interface FastEthernet0/5
+ ip dhcp snooping trust
+ 
+interface FastEthernet0/6
+ ip dhcp snooping trust
+ 
+ip arp inspection vlan 90,100,110,120
+ 
+interface FastEthernet0/5
+ ip arp inspection trust
+ 
+interface FastEthernet0/6
+ ip arp inspection trust
+ 
+end
+write memory
+ 
+ 
+================================================================================
+  VERIFICATION COMMANDS — QUICK REFERENCE
+================================================================================
+ 
+! ── Routing ──────────────────────────────────────────────────────────────────
+show ip route
+show ip ospf neighbor
+show ip ospf database
+show ip ospf interface brief
+ 
+! ── Switching ─────────────────────────────────────────────────────────────────
+show vlan brief
+show interfaces trunk
+show etherchannel summary
+show spanning-tree
+show spanning-tree summary
+ 
+! ── Redundancy ────────────────────────────────────────────────────────────────
+show standby brief
+show standby
+ 
+! ── DHCP ─────────────────────────────────────────────────────────────────────
+show ip dhcp binding
+show ip dhcp pool
+show ip dhcp conflict
+ 
+! ── Security ──────────────────────────────────────────────────────────────────
+show ip dhcp snooping
+show ip dhcp snooping binding
+show ip arp inspection
+show ip arp inspection statistics
+show port-security
+show port-security interface <interface>
+show port-security address
+ 
+! ── Interfaces ────────────────────────────────────────────────────────────────
+show ip interface brief
+show interfaces <interface>
+show run | section ospf
+show run | section vlan
+show run | section interface
+ 
+================================================================================
+  END OF COMMANDS.TXT
+  github.com/Brxdl3y | USIU Campus Network Simulation
+============================================================================
+ 
+ 
