@@ -12,19 +12,19 @@ The topology spans four routing domains, multiple distribution zones, dual-stack
 
 **Key Features**
 
-MD5 encryption on all routers and switches for secure OSPF authentication.
+🔸MD5 encryption on all routers and switches for secure OSPF authentication.
 
-Access ports and trunks configured for VLAN segmentation.
+🔸Access ports and trunks configured for VLAN segmentation.
 
-Port‑security with sticky MACs and violation modes.
+🔸Port‑security with sticky MACs and violation modes.
 
-DHCP pools for 12 VLANs, with helper addresses inside SVIs.
+🔸DHCP pools for 12 VLANs, with helper addresses inside SVIs.
 
-DHCP Snooping and Dynamic ARP Inspection for Layer 2 security.
+🔸DHCP Snooping and Dynamic ARP Inspection for Layer 2 security.
 
-EtherChannel for link aggregation and redundancy.
+🔸EtherChannel for link aggregation and redundancy.
 
-ACLs applied for traffic filtering and security policies.
+🔸ACLs applied for traffic filtering and security policies.
 
 HSRP for gateway redundancy.
 
