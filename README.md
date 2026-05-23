@@ -1,9 +1,9 @@
-🏛️ USIU Campus Network — Enterprise Network Simulation
+🏛️ **USIU Campus Network — Enterprise Network Simulation**
 
 A full-scale, multi-layer enterprise campus network simulation built in Cisco Packet Tracer, modelled after a real private university environment (USIU-Africa, Nairobi). Designed to demonstrate production-grade network engineering across routing, switching, security, redundancy, and automation-readiness.
 
 
-📌 Project Overview
+📌 **Project Overview**
 
 This project simulates the complete network infrastructure of a university campus — from edge connectivity to end-user access — using a strict three-tier hierarchical design model. Every design decision mirrors real-world enterprise deployments, covering Layer 2 hardening, Layer 3 dynamic routing, gateway redundancy, DHCP relay, and network security enforcement across 12 VLANs serving multiple academic and administrative departments.
 
@@ -26,15 +26,15 @@ The topology spans four routing domains, multiple distribution zones, dual-stack
 
 🔸ACLs applied for traffic filtering and security policies.
 
-HSRP for gateway redundancy.
+🔸HSRP for gateway redundancy.
 
-STP with priority tuning to prevent loops.
+🔸STP with priority tuning to prevent loops.
 
-Loopbacks for router identification and OSPF stability.
+🔸Loopbacks for router identification and OSPF stability.
 
-Passive interfaces in OSPF to reduce unnecessary hello traffic.
+🔸Passive interfaces in OSPF to reduce unnecessary hello traffic.
 
-IP routing enabled on Layer 3 switches for inter‑VLAN communication.
+🔸IP routing enabled on Layer 3 switches for inter‑VLAN communication.
 
 Serial connections with clock rate and PPP encapsulation for WAN simulation.
 
