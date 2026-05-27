@@ -42,23 +42,25 @@ The topology spans four routing domains, multiple distribution zones, dual-stack
 
 🔸ISP provider cloud integrated to simulate internet access.
 
+
 **🌐 Advanced Concepts Added**
 
 To make the design more sophisticated:
 
 AAA authentication using local database (future RADIUS/TACACS+ integration).
 
-Syslog and SNMP for monitoring and logging.
+**Syslog and SNMP** for monitoring and logging.
 
-NTP for time synchronization across all devices.
+**NTP** for time synchronization across all devices.
 
-QoS policies for prioritizing voice/video traffic.
+**QoS policies** for prioritizing voice/video traffic.
 
 Cloud integration concepts (simulated ISP + external services).
 
-IPv6 readiness with dual‑stack addressing for future scalability.
+**IPv6** readiness with dual‑stack addressing for future scalability.
 
-Security hardening: disabling unused ports, service password encryption, and banner warnings.
+**Security hardening**: disabling unused ports, service password encryption, and banner warnings.
+
 
 **Objectives**
 
