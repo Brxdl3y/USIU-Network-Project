@@ -30,15 +30,15 @@ The topology spans four routing domains, multiple distribution zones, dual-stack
 
 🔸**STP** with priority tuning to prevent loops.
 
-🔸Loopbacks for router identification and OSPF stability.
+🔸**Loopbacks** for router identification and OSPF stability.
 
-🔸Passive interfaces in OSPF to reduce unnecessary hello traffic.
+🔸**Passive interfaces** in OSPF to reduce unnecessary hello traffic.
 
-🔸IP routing enabled on Layer 3 switches for inter‑VLAN communication.
+🔸**IP routing** enabled on Layer 3 switches for inter‑VLAN communication.
 
-🔸Serial connections with clock rate and PPP encapsulation for WAN simulation.
+🔸**Serial connections** with clock rate and PPP encapsulation for WAN simulation.
 
-🔸Static route to ISP for external connectivity.
+🔸**Static route** to ISP for external connectivity.
 
 🔸ISP provider cloud integrated to simulate internet access.
 
