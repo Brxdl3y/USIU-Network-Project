@@ -47,7 +47,7 @@ The topology spans four routing domains, multiple distribution zones, dual-stack
 
 To make the design more sophisticated:
 
-AAA authentication using local database (future RADIUS/TACACS+ integration).
+**AAA authentication** using local database (future RADIUS/TACACS+ integration).
 
 **Syslog and SNMP** for monitoring and logging.
 
