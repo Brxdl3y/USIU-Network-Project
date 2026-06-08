@@ -10,7 +10,7 @@ This project simulates the complete network infrastructure of a university campu
 The topology spans four routing domains, multiple distribution zones, dual-stack redundancy via HSRP, inter-VLAN routing via SVIs, and an ISP uplink with static routing — making it one of the most comprehensive student-grade network simulations achievable in Packet Tracer.
 
 
-**Key Features**
+📌**Key Features**
 
 🔸**MD5 encryption** on all routers and switches for secure OSPF authentication.
 
@@ -62,7 +62,7 @@ Cloud integration concepts (simulated ISP + external services).
 **Security hardening**: disabling unused ports, service password encryption, and banner warnings.
 
 
-**Objectives**
+📌**Objectives**
 
 This project was built to simulate real-world enterprise networking operations and demonstrate practical skills in:
 
@@ -92,7 +92,7 @@ Access Layer
 4x Cisco 2960-24TT L2 switches — VLAN access port assignment, 802.1Q trunking, EtherChannel to distribution, port security, DHCP Snooping, and DAI enforcement
 
 
-**Technologies & Protocols Implemented**
+📌**Technologies & Protocols Implemented**
 
 VLAN Segmentation
 
@@ -114,7 +114,7 @@ VLAN	Department
 120	Engineering & Robotics 
 
 
-**Trunking**
+📌**Trunking**
 
 802.1Q trunk links were configured between switches to allow multiple VLANs across uplinks.
 
@@ -164,7 +164,7 @@ Unauthorized switch access
 MAC flooding attacks
 
 
-Routing
+📌Routing
 
 OSPFv2 Multi-Area — Area 0 (backbone), Area 2, Area 3, Area 4 with proper ABR configuration.
 Static Routing — Default route to ISP (ip route 0.0.0.0 0.0.0.0) for internet connectivity.
