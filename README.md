@@ -53,7 +53,7 @@ To make the design more sophisticated:
 
 ➜**NTP** for time synchronization across all devices.
 
-**QoS policies** for prioritizing voice/video traffic.
+➜**QoS policies** for prioritizing voice/video traffic.
 
 ➜Cloud integration concepts (simulated ISP + external services).
 
@@ -66,12 +66,12 @@ To make the design more sophisticated:
 
 This project was built to simulate real-world enterprise networking operations and demonstrate practical skills in:
 
-Enterprise campus design
-Layer 2 and Layer 3 switching
-VLAN segmentation
-Routing and route advertisement
-High availability and redundancy
-Network hardening and access control
+▪Enterprise campus design
+▪Layer 2 and Layer 3 switching
+▪VLAN segmentation
+▪Routing and route advertisement
+▪High availability and redundancy
+▪Network hardening and access control
 DHCP deployment and troubleshooting
 Secure switch configurations
 Scalability and fault tolerance
