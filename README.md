@@ -5,7 +5,7 @@ A full-scale, multi-layer enterprise campus network simulation built in Cisco Pa
 
 📌 **Project Overview**
 
-This project simulates the complete network infrastructure of a university campus — from edge connectivity to end-user access — using a strict three-tier hierarchical design model. Every design decision mirrors real-world enterprise deployments, covering Layer 2 hardening, Layer 3 dynamic routing, gateway redundancy, DHCP relay, and network security enforcement across 12 VLANs serving multiple academic and administrative departments.
+This project simulates the complete network infrastructure of a university campus - from edge connectivity to end-user access — using a strict three-tier hierarchical design model. Every design decision mirrors real-world enterprise deployments, covering Layer 2 hardening, Layer 3 dynamic routing, gateway redundancy, DHCP relay, and network security enforcement across 12 VLANs serving multiple academic and administrative departments.
 
 The topology spans four routing domains, multiple distribution zones, dual-stack redundancy via HSRP, inter-VLAN routing via SVIs, and an ISP uplink with static routing — making it one of the most comprehensive student-grade network simulations achievable in Packet Tracer.
 
@@ -47,19 +47,19 @@ The topology spans four routing domains, multiple distribution zones, dual-stack
 
 To make the design more sophisticated:
 
-**AAA authentication** using local database (future RADIUS/TACACS+ integration).
+➜**AAA authentication** using local database (future RADIUS/TACACS+ integration).
 
-**Syslog and SNMP** for monitoring and logging.
+➜**Syslog and SNMP** for monitoring and logging.
 
-**NTP** for time synchronization across all devices.
+➜**NTP** for time synchronization across all devices.
 
 **QoS policies** for prioritizing voice/video traffic.
 
-Cloud integration concepts (simulated ISP + external services).
+➜Cloud integration concepts (simulated ISP + external services).
 
-**IPv6** readiness with dual‑stack addressing for future scalability.
+➜**IPv6** readiness with dual‑stack addressing for future scalability.
 
-**Security hardening**: disabling unused ports, service password encryption, and banner warnings.
+➜**Security hardening**: disabling unused ports, service password encryption, and banner warnings.
 
 
 📌**Objectives**
