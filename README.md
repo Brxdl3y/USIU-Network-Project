@@ -129,9 +129,11 @@ VLAN	Department
 
 Features implemented:
 
-Native VLAN configuration
-Allowed VLAN restrictions
-Multi-switch trunking architecture
+•Native VLAN configuration
+
+•Allowed VLAN restrictions
+
+•Multi-switch trunking architecture
 
 
 **EtherChannel**
