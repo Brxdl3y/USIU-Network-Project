@@ -110,15 +110,25 @@ USI-CORE-R1 (Cisco 2911) — Central routing hub, OSPF backbone (Area 0), connec
 VLAN	Department
 
 10	Hostels
+
 20	CCTV & Security
+
 30	CompLab & ICT Department
+
 40	Library & Innovation Hub
+
 50	Finance & Economics
+
 60	Cafeteria
+
 70	Conference Centre
+
 80	Administration
+
 90	Lecture Halls
+
 100	Medical Labs & Scientific Research Dept
+
 110	Court Room
 120	Engineering & Robotics 
 
