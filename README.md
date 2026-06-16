@@ -90,15 +90,15 @@ This project was built to simulate real-world enterprise networking operations a
 🏗️ **Architecture — Three-Tier Hierarchical Design**
 **Core Layer**
 
-USI-CORE-R1 (Cisco 2911) — Central routing hub, OSPF backbone (Area 0), connects all distribution zones via serial and GigabitEthernet uplinks
+**USI-CORE-R1 (Cisco 2911)** — Central routing hub, OSPF backbone (Area 0), connects all distribution zones via serial and GigabitEthernet uplinks
 
 **Distribution Layer**
 
-4x Cisco 3560-24PS L3 switches — Inter-VLAN routing via SVIs, HSRP active/standby gateway redundancy, EtherChannel uplinks to access layer, OSPF participation, DHCP relay via ip helper-address
+**4x Cisco 3560-24PS L3 switches** — Inter-VLAN routing via SVIs, HSRP active/standby gateway redundancy, EtherChannel uplinks to access layer, OSPF participation, DHCP relay via ip helper-address
 
 **Access Layer**
 
-4x Cisco 2960-24TT L2 switches — VLAN access port assignment, 802.1Q trunking, EtherChannel to distribution, port security, DHCP Snooping, and DAI enforcement
+**4x Cisco 2960-24TT L2 switches** — VLAN access port assignment, 802.1Q trunking, EtherChannel to distribution, port security, DHCP Snooping, and DAI enforcement
 
 
 📌**Technologies & Protocols Implemented**
@@ -130,6 +130,7 @@ VLAN	Department
 100	Medical Labs & Scientific Research Dept
 
 110	Court Room
+
 120	Engineering & Robotics 
 
 
@@ -151,7 +152,9 @@ Features implemented:
 EtherChannel was configured between switches to provide:
 
 Link aggregation
+
 Increased bandwidth
+
 Redundancy
 Loop prevention
 
