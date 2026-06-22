@@ -109,21 +109,21 @@ This project was built to simulate real-world enterprise networking operations a
 
 VLAN	Department
 
-10	Hostels
+➔10	Hostels
 
-20	CCTV & Security
+➔20	CCTV & Security
 
-30	CompLab & ICT Department
+➔30	CompLab & ICT Department
 
-40	Library & Innovation Hub
+➔40	Library & Innovation Hub
 
-50	Finance & Economics
+➔50	Finance & Economics
 
-60	Cafeteria
+➔60	Cafeteria
 
-70	Conference Centre
+➔70	Conference Centre
 
-80	Administration
+➔80	Administration
 
 90	Lecture Halls
 
