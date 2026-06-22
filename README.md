@@ -88,22 +88,22 @@ This project was built to simulate real-world enterprise networking operations a
 
 
 🏗️ **Architecture — Three-Tier Hierarchical Design**
-**Core Layer**
+✅**Core Layer**
 
 **USI-CORE-R1 (Cisco 2911)** — Central routing hub, OSPF backbone (Area 0), connects all distribution zones via serial and GigabitEthernet uplinks
 
-**Distribution Layer**
+✅**Distribution Layer**
 
 **4x Cisco 3560-24PS L3 switches** — Inter-VLAN routing via SVIs, HSRP active/standby gateway redundancy, EtherChannel uplinks to access layer, OSPF participation, DHCP relay via ip helper-address
 
-**Access Layer**
+✅**Access Layer**
 
 **4x Cisco 2960-24TT L2 switches** — VLAN access port assignment, 802.1Q trunking, EtherChannel to distribution, port security, DHCP Snooping, and DAI enforcement
 
 
 📌**Technologies & Protocols Implemented**
 
-**VLAN Segmentation**
+✅**VLAN Segmentation**
 
 12 VLANs were created to isolate departments and reduce broadcast domains.
 
