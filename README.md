@@ -125,13 +125,13 @@ VLAN	Department
 
 ➔80	Administration
 
-90	Lecture Halls
+➔90	Lecture Halls
 
-100	Medical Labs & Scientific Research Dept
+➔100	Medical Labs & Scientific Research Dept
 
-110	Court Room
+➔110	Court Room
 
-120	Engineering & Robotics 
+➔120	Engineering & Robotics 
 
 
 📌**Trunking**
