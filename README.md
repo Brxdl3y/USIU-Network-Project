@@ -149,13 +149,14 @@ Features implemented:
 
 **EtherChannel**
 
-EtherChannel was configured between switches to provide:
+🔘EtherChannel was configured between switches to provide:
 
-Link aggregation
+🔘Link aggregation
 
-Increased bandwidth
+🔘Increased bandwidth
 
-Redundancy
+🔘Redundancy
+
 Loop prevention
 
 Protocols used:
