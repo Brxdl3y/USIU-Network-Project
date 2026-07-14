@@ -157,7 +157,7 @@ Features implemented:
 
 🔘Redundancy
 
-Loop prevention
+🔘Loop prevention
 
 Protocols used:
 
@@ -207,8 +207,9 @@ SVIs — Layer 3 virtual interfaces on all distribution switches for inter-VLAN 
 
 Redundancy & High Availability
 
-HSRP (Hot Standby Router Protocol) — Active/standby gateway redundancy per VLAN, virtual IPs as default gateways, priority and preempt configured, group IDs matching VLAN IDs.
-EtherChannel — Link aggregation providing both redundancy and load balancing on uplinks.
+🔘HSRP (Hot Standby Router Protocol) — Active/standby gateway redundancy per VLAN, virtual IPs as default gateways, priority and preempt configured, group IDs matching VLAN IDs.
+
+🔘EtherChannel — Link aggregation providing both redundancy and load balancing on uplinks.
 
 DHCP
 
