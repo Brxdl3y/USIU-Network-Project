@@ -159,9 +159,9 @@ Features implemented:
 
 🔘Loop prevention
 
-Protocols used:
+🔘Protocols used:
 
-PAgP (desirable mode)
+🔘PAgP (desirable mode)
 
 **Spanning Tree Protocol (STP)**
 
