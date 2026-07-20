@@ -163,7 +163,7 @@ Features implemented:
 
 🔘PAgP (desirable mode)
 
-**Spanning Tree Protocol (STP)**
+📌**Spanning Tree Protocol (STP)**
 
 Rapid-PVST was implemented for loop prevention and optimized convergence.
 
