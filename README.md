@@ -147,7 +147,7 @@ Features implemented:
 •Multi-switch trunking architecture
 
 
-**EtherChannel**
+📌**EtherChannel**
 
 🔘EtherChannel was configured between switches to provide:
 
