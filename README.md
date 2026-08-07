@@ -174,7 +174,7 @@ Priority adjustments
 PortFast
 BPDU Guard
 
-**Port Security**
+📌**Port Security**
 
 Access ports were hardened using:
 
@@ -197,7 +197,7 @@ Route Redistribution — Connected subnets redistributed into OSPF on L3 distrib
 Loopback Interfaces — Stable router IDs on all routers, used as OSPF router-ID anchors.
 Passive Interfaces — Configured on all access-facing SVIs to suppress unnecessary OSPF hellos.
 
-Switching
+📌 Switching
 
 VLANs — 12 VLANs, consistently provisioned across all switches.
 802.1Q Trunking — All inter-switch and switch-to-router links, explicit VLAN allow lists.
@@ -205,7 +205,7 @@ EtherChannel (PAgP) — Port-channel bundles (Po1, Po3) on all distribution-to-a
 STP (Rapid-PVST+) — Per-VLAN spanning tree with explicit root bridge priority assignments, PortFast and BPDUGuard on all access ports.
 SVIs — Layer 3 virtual interfaces on all distribution switches for inter-VLAN routing and HSRP.
 
-Redundancy & High Availability
+📌 Redundancy & High Availability
 
 🔘HSRP (Hot Standby Router Protocol) — Active/standby gateway redundancy per VLAN, virtual IPs as default gateways, priority and preempt configured, group IDs matching VLAN IDs.
 
