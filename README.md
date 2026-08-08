@@ -40,7 +40,7 @@ The topology spans four routing domains, multiple distribution zones, dual-stack
 
 🔸**Static route** to ISP for external connectivity.
 
-🔸ISP provider cloud integrated to simulate internet access.
+🔸**ISP** provider cloud integrated to simulate internet access.
 
 
 **🌐 Advanced Concepts Added**
@@ -90,7 +90,7 @@ This project was built to simulate real-world enterprise networking operations a
 🏗️ **Architecture — Three-Tier Hierarchical Design**
 ✅**Core Layer**
 
-**USI-CORE-R1 (Cisco 2911)** — Central routing hub, OSPF backbone (Area 0), connects all distribution zones via serial and GigabitEthernet uplinks
+**USIU -CORE-R1 (Cisco 2911)** — Central routing hub, OSPF backbone (Area 0), connects all distribution zones via serial and GigabitEthernet uplinks
 
 ✅**Distribution Layer**
 
