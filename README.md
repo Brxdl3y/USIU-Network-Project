@@ -171,16 +171,18 @@ Enhancements include:
 
 Root bridge tuning
 Priority adjustments
+
 PortFast
+
 BPDU Guard
 
 📌**Port Security**
 
 Access ports were hardened using:
 
-Sticky MAC learning
-MAC address limits
-Restrict violation mode
+•Sticky MAC learning
+•MAC address limits
+•Restrict violation mode
 
 This prevents:
 
@@ -192,10 +194,14 @@ MAC flooding attacks
 📌**Routing**
 
 OSPFv2 Multi-Area — Area 0 (backbone), Area 2, Area 3, Area 4 with proper ABR configuration.
+
 Static Routing — Default route to ISP (ip route 0.0.0.0 0.0.0.0) for internet connectivity.
+
 Route Redistribution — Connected subnets redistributed into OSPF on L3 distribution switches.
-Loopback Interfaces — Stable router IDs on all routers, used as OSPF router-ID anchors.
-Passive Interfaces — Configured on all access-facing SVIs to suppress unnecessary OSPF hellos.
+
+•Loopback Interfaces — Stable router IDs on all routers, used as OSPF router-ID anchors.
+
+•Passive Interfaces — Configured on all access-facing SVIs to suppress unnecessary OSPF hellos.
 
 📌 **Switching**
 
