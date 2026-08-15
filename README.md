@@ -185,19 +185,20 @@ Access ports were hardened using:
 •Restrict violation mode
 
 This prevents:
-
 Rogue devices
+
 Unauthorized switch access
+
 MAC flooding attacks
 
 
 📌**Routing**
 
-OSPFv2 Multi-Area — Area 0 (backbone), Area 2, Area 3, Area 4 with proper ABR configuration.
+•OSPFv2 Multi-Area — Area 0 (backbone), Area 2, Area 3, Area 4 with proper ABR configuration.
 
-Static Routing — Default route to ISP (ip route 0.0.0.0 0.0.0.0) for internet connectivity.
+•Static Routing — Default route to ISP (ip route 0.0.0.0 0.0.0.0) for internet connectivity.
 
-Route Redistribution — Connected subnets redistributed into OSPF on L3 distribution switches.
+•Route Redistribution — Connected subnets redistributed into OSPF on L3 distribution switches.
 
 •Loopback Interfaces — Stable router IDs on all routers, used as OSPF router-ID anchors.
 
@@ -206,8 +207,11 @@ Route Redistribution — Connected subnets redistributed into OSPF on L3 distrib
 📌 **Switching**
 
 VLANs — 12 VLANs, consistently provisioned across all switches.
+
 802.1Q Trunking — All inter-switch and switch-to-router links, explicit VLAN allow lists.
+
 EtherChannel (PAgP) — Port-channel bundles (Po1, Po3) on all distribution-to-access uplinks for redundancy and bandwidth aggregation.
+
 STP (Rapid-PVST+) — Per-VLAN spanning tree with explicit root bridge priority assignments, PortFast and BPDUGuard on all access ports.
 SVIs — Layer 3 virtual interfaces on all distribution switches for inter-VLAN routing and HSRP.
 
